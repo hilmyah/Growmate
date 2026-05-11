@@ -1,9 +1,3 @@
-Berikut adalah draf file README.md yang dirancang untuk pengunjung dan panduan teknis bagi Anda untuk melakukan push repository ke GitHub.
-
----
-
-## README.md
-
 # Growmate — Smart Irrigation System
 
 Growmate adalah sistem irigasi cerdas berbasis ESP8266 yang memungkinkan pemantauan dan kontrol kelembaban tanah melalui Web Dashboard, aplikasi Blynk, dan bot WhatsApp. Sistem ini dirancang untuk otomasi penyiraman tanaman dengan fitur akses jarak jauh menggunakan Cloudflare Tunnel.
