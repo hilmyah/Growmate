@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Growmate — Project Links</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0a;
+      font-family: 'DM Sans', sans-serif;
+      color: #e8e8e8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo-mark {
+      width: 48px;
+      height: 48px;
+      background: #2d4f38;
+      border: 1px solid #4a7c59;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .logo-mark svg {
+      width: 24px;
+      height: 24px;
+      stroke: #6aab7e;
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+    }
+
+    .header p {
+      font-size: 12px;
+      color: #666;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #1e1e1e;
+      margin: 0 0 32px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #444;
+      margin-bottom: 10px;
+      padding-left: 2px;
+    }
+
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .link-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 8px;
+      padding: 14px 16px;
+      text-decoration: none;
+      color: #e8e8e8;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .link-item:hover {
+      border-color: #4a7c59;
+      background: #141414;
+    }
+
+    .link-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .link-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* per-platform icon colors */
+    .icon-ig    { background: #1a1020; }
+    .icon-ig svg    { stroke: #c77dff; }
+    .icon-tt    { background: #0a1a1a; }
+    .icon-tt svg    { stroke: #5fe0d0; }
+    .icon-yt    { background: #1a0a0a; }
+    .icon-yt svg    { stroke: #e05050; }
+    .icon-gh    { background: #101418; }
+    .icon-gh svg    { stroke: #8b949e; }
+    .icon-web   { background: #0a1218; }
+    .icon-web svg   { stroke: #6aab7e; }
+
+    .link-text {}
+    .link-name {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .link-desc {
+      font-size: 11px;
+      color: #555;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .link-arrow {
+      margin-left: auto;
+      color: #333;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .link-item:hover .link-arrow { color: #4a7c59; }
+
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      color: #333;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    /* Mobile responsive — already single-column, just tweak padding */
+    @media (max-width: 480px) {
+      body { padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <div class="logo-mark">
+        <!-- Leaf / plant icon -->
+        <svg viewBox="0 0 24 24">
+          <path d="M12 22V12"/>
+          <path d="M12 12C12 12 7 10 5 6c4 0 7 2 7 6z"/>
+          <path d="M12 12c0 0 5-2 7-6c-4 0-7 2-7 6z"/>
+        </svg>
+      </div>
+      <h1>Growmate</h1>
+      <p>Smart Irrigation System</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section-label">Follow our project</div>
+    <div class="links">
+
+      <a href="https://instagram.com/YOUR_IG_HANDLE" target="_blank" class="link-item">
+        <div class="link-icon icon-ig">
+          <!-- Instagram icon -->
+          <svg viewBox="0 0 24 24">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="link-text">
+          <div class="link-name">Instagram</div>
+          <div class="link-desc">@YOUR_IG_HANDLE</div>
+        </div>
+        <span class="link-arrow">›</span>
+      </a>
+
+      <a href="https://tiktok.com/@YOUR_TT_HANDLE" target="_blank" class="link-item">
+        <div class="link-icon icon-tt">
+          <!-- TikTok icon (simplified) -->
+          <svg viewBox="0 0 24 24">
+            <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
+          </svg>
+        </div>
+        <div class="link-text">
+          <div class="link-name">TikTok</div>
+          <div class="link-desc">@YOUR_TT_HANDLE</div>
+        </div>
+        <span class="link-arrow">›</span>
+      </a>
+
+      <a href="https://youtube.com/@YOUR_YT_HANDLE" target="_blank" class="link-item">
+        <div class="link-icon icon-yt">
+          <!-- YouTube icon -->
+          <svg viewBox="0 0 24 24">
+            <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/>
+            <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#e05050" stroke="none"/>
+          </svg>
+        </div>
+        <div class="link-text">
+          <div class="link-name">YouTube</div>
+          <div class="link-desc">@YOUR_YT_HANDLE</div>
+        </div>
+        <span class="link-arrow">›</span>
+      </a>
+
+    </div>
+
+    <div class="section-label">Project resources</div>
+    <div class="links">
+
+      <a href="https://github.com/YOUR_USERNAME/growmate" target="_blank" class="link-item">
+        <div class="link-icon icon-gh">
+          <!-- GitHub icon -->
+          <svg viewBox="0 0 24 24">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+          </svg>
+        </div>
+        <div class="link-text">
+          <div class="link-name">GitHub</div>
+          <div class="link-desc">Source code &amp; wiring diagram</div>
+        </div>
+        <span class="link-arrow">›</span>
+      </a>
+
+      <a href="http://growmate.local" target="_blank" class="link-item">
+        <div class="link-icon icon-web">
+          <!-- Monitor/device icon -->
+          <svg viewBox="0 0 24 24">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </div>
+        <div class="link-text">
+          <div class="link-name">Live Dashboard</div>
+          <div class="link-desc">growmate.local (same network)</div>
+        </div>
+        <span class="link-arrow">›</span>
+      </a>
+
+    </div>
+
+    <div class="footer">Growmate &nbsp;&middot;&nbsp; PKK &nbsp;&middot;&nbsp; 2025</div>
+
+  </div>
+</body>
+</html>
