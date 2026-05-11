@@ -29,7 +29,7 @@ const char* password = "wlanf53617";
 const int soilPin  = A0;
 const int relayPin = 2;   // D4, active LOW
 
-// -------------------------------------------------------------
+// -------------------------------------------------------------w
 //  EEPROM layout
 //  [0..1]  int   threshold
 //  [2]     byte  presetCount
@@ -213,7 +213,7 @@ const char MAIN_page[] PROGMEM =
 ".br{display:flex;gap:6px;margin-bottom:12px;}"
 ".cbtn{flex:1;padding:8px 0;border-radius:5px;border:1px solid var(--bd2);background:transparent;color:var(--tl);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s,color .15s;}"
 ".cbtn:hover{background:rgba(128,128,128,.06);}"
-".aa{background:rgba(52,130,200,.1)!im-nt;border-color:#3482c8!important;color:#3482c8!important;}"
+".aa{background:rgba(52,130,200,.1)!important;border-color:#3482c8!important;color:#3482c8!important;}"
 ".ao{background:rgba(74,124,89,.12)!important;border-color:var(--g)!important;color:var(--gh)!important;}"
 ".af{background:rgba(160,48,48,.1)!important;border-color:var(--rd)!important;color:var(--rd)!important;}"
 
