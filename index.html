@@ -100,27 +100,45 @@
       margin-bottom: 36px;
     }
 
-    .logo-wrap {
-      width: 64px;
-      height: 64px;
-      border-radius: 12px;
-      overflow: hidden;
-      margin: 0 auto 16px;
-      border: 1px solid var(--border2);
-      background: var(--green-dim);
+    .logos-container {
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo-wrap {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+    }
+
+    .logo-wrap.square {
+      width: 64px;
+      height: 64px;
+      background: var(--green-dim);
+      flex-shrink: 0;
+    }
+
+    .logo-wrap.rect {
+      height: 64px;
+      width: auto;
+      max-width: 160px;
+      background: var(--surface);
     }
 
     .logo-wrap img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       display: block;
     }
 
-    /* Fallback icon jika gambar tidak ditemukan */
     .logo-wrap svg {
       width: 30px;
       height: 30px;
@@ -278,14 +296,11 @@
 <body>
   <div class="container">
 
-    <!-- Theme toggle -->
     <div class="top-bar">
       <button class="theme-btn" onclick="toggleTheme()" id="theme-btn" aria-label="Toggle light/dark mode">
-        <!-- Moon icon (dark mode) -->
         <svg id="icon-dark" viewBox="0 0 24 24">
           <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
         </svg>
-        <!-- Sun icon (light mode) — hidden initially -->
         <svg id="icon-light" viewBox="0 0 24 24" style="display:none">
           <circle cx="12" cy="12" r="5"/>
           <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
@@ -297,28 +312,25 @@
       </button>
     </div>
 
-    <!-- Header -->
     <div class="header">
-      <div class="logo-wrap">
-        <img
-          src="asset/growmate.png"
-          alt="Growmate Logo"
-          onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"
-        />
-        <!-- Fallback SVG leaf icon -->
-        <svg viewBox="0 0 24 24">
-          <path d="M12 22V12"/>
-          <path d="M12 12C12 12 7 10 5 6c4 0 7 2 7 6z"/>
-          <path d="M12 12c0 0 5-2 7-6c-4 0-7 2-7 6z"/>
-        </svg>
+      <div class="logos-container">
+        <div class="logo-wrap square">
+          <img src="asset/growmate.png" alt="Growmate Icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'" />
+          <svg viewBox="0 0 24 24">
+            <path d="M12 22V12"/><path d="M12 12C12 12 7 10 5 6c4 0 7 2 7 6z"/><path d="M12 12c0 0 5-2 7-6c-4 0-7 2-7 6z"/>
+          </svg>
+        </div>
+        <div class="logo-wrap rect">
+          <img src="asset/growmate1.png" alt="Growmate Full Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'" />
+          <svg viewBox="0 0 24 24">
+            <path d="M12 22V12"/><path d="M12 12C12 12 7 10 5 6c4 0 7 2 7 6z"/><path d="M12 12c0 0 5-2 7-6c-4 0-7 2-7 6z"/>
+          </svg>
+        </div>
       </div>
-      <h1>Growmate</h1>
-      <p>Smart Irrigation System</p>
-    </div>
+      </div>
 
     <hr class="divider">
 
-    <!-- Social links -->
     <div class="section-label">Follow our project</div>
     <div class="links">
 
@@ -366,7 +378,6 @@
 
     </div>
 
-    <!-- Project resource links -->
     <div class="section-label">Project resources</div>
     <div class="links">
 
