@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,15 +8,46 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #1e1e1e;
+      --border2: #2a2a2a;
+      --text: #e8e8e8;
+      --muted: #555555;
+      --label: #444444;
+      --green: #4a7c59;
+      --green-hi: #6aab7e;
+      --green-dim: #2d4f38;
+      --btn-bg: #161616;
+      --btn-hover: #1c1c1c;
+    }
+
+    [data-theme="light"] {
+      --bg: #f5f5f3;
+      --surface: #ffffff;
+      --border: #e4e4e0;
+      --border2: #d8d8d4;
+      --text: #1a1a1a;
+      --muted: #888888;
+      --label: #aaaaaa;
+      --green: #3d6b4a;
+      --green-hi: #3d6b4a;
+      --green-dim: #d4ead9;
+      --btn-bg: #f0f0ee;
+      --btn-hover: #e8e8e6;
+    }
+
     body {
-      background: #0a0a0a;
+      background: var(--bg);
       font-family: 'DM Sans', sans-serif;
-      color: #e8e8e8;
+      color: var(--text);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 32px 20px;
+      transition: background 0.2s, color 0.2s;
     }
 
     .container {
@@ -24,31 +55,86 @@
       max-width: 420px;
     }
 
-    .header {
-      text-align: center;
-      margin-bottom: 40px;
+    /* ── Theme toggle ── */
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 24px;
     }
 
-    .logo-mark {
-      width: 48px;
-      height: 48px;
-      background: #2d4f38;
-      border: 1px solid #4a7c59;
-      border-radius: 10px;
+    .theme-btn {
       display: flex;
       align-items: center;
-      justify-content: center;
-      margin: 0 auto 16px;
+      gap: 6px;
+      background: var(--btn-bg);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      letter-spacing: 0.3px;
     }
 
-    .logo-mark svg {
-      width: 24px;
-      height: 24px;
-      stroke: #6aab7e;
+    .theme-btn:hover {
+      border-color: var(--green);
+      color: var(--green-hi);
+    }
+
+    .theme-btn svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
       fill: none;
       stroke-width: 1.5;
       stroke-linecap: round;
       stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .logo-wrap {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 0 auto 16px;
+      border: 1px solid var(--border2);
+      background: var(--green-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Fallback icon jika gambar tidak ditemukan */
+    .logo-wrap svg {
+      width: 30px;
+      height: 30px;
+      stroke: var(--green-hi);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      display: none;
+    }
+
+    .logo-wrap img.error + svg,
+    .logo-wrap:not(:has(img)) svg {
+      display: block;
     }
 
     .header h1 {
@@ -56,30 +142,34 @@
       font-weight: 600;
       letter-spacing: -0.3px;
       margin-bottom: 6px;
+      color: var(--text);
     }
 
     .header p {
-      font-size: 12px;
-      color: #666;
+      font-size: 11px;
+      color: var(--label);
       letter-spacing: 1.5px;
       text-transform: uppercase;
     }
 
+    /* ── Divider ── */
     .divider {
       border: none;
-      border-top: 1px solid #1e1e1e;
-      margin: 0 0 32px;
+      border-top: 1px solid var(--border);
+      margin: 0 0 28px;
     }
 
+    /* ── Section label ── */
     .section-label {
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 2px;
-      color: #444;
+      color: var(--label);
       margin-bottom: 10px;
       padding-left: 2px;
     }
 
+    /* ── Link list ── */
     .links {
       display: flex;
       flex-direction: column;
@@ -91,18 +181,18 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      background: #111;
-      border: 1px solid #222;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 8px;
       padding: 14px 16px;
       text-decoration: none;
-      color: #e8e8e8;
+      color: var(--text);
       transition: border-color 0.15s, background 0.15s;
     }
 
     .link-item:hover {
-      border-color: #4a7c59;
-      background: #141414;
+      border-color: var(--green);
+      background: var(--btn-hover);
     }
 
     .link-icon {
@@ -124,49 +214,62 @@
       stroke-linejoin: round;
     }
 
-    /* per-platform icon colors */
-    .icon-ig    { background: #1a1020; }
-    .icon-ig svg    { stroke: #c77dff; }
-    .icon-tt    { background: #0a1a1a; }
-    .icon-tt svg    { stroke: #5fe0d0; }
-    .icon-yt    { background: #1a0a0a; }
-    .icon-yt svg    { stroke: #e05050; }
-    .icon-gh    { background: #101418; }
-    .icon-gh svg    { stroke: #8b949e; }
-    .icon-web   { background: #0a1218; }
-    .icon-web svg   { stroke: #6aab7e; }
+    /* Icon platform colors */
+    .icon-ig  { background: #1a1020; }
+    .icon-ig svg { stroke: #c77dff; }
+    .icon-tt  { background: #0a1a1a; }
+    .icon-tt svg { stroke: #5fe0d0; }
+    .icon-yt  { background: #1a0a0a; }
+    .icon-yt svg { stroke: #e05050; }
+    .icon-gh  { background: #101418; }
+    .icon-gh svg { stroke: #8b949e; }
+    .icon-gh2 { background: #0f1218; }
+    .icon-gh2 svg { stroke: #79b8ff; }
+    .icon-web { background: #0a1218; }
+    .icon-web svg { stroke: var(--green-hi); }
 
-    .link-text {}
+    [data-theme="light"] .icon-ig  { background: #f3ecff; }
+    [data-theme="light"] .icon-tt  { background: #e8fafa; }
+    [data-theme="light"] .icon-yt  { background: #fff0f0; }
+    [data-theme="light"] .icon-gh  { background: #f0f2f4; }
+    [data-theme="light"] .icon-gh2 { background: #eef4ff; }
+    [data-theme="light"] .icon-web { background: var(--green-dim); }
+
     .link-name {
       font-size: 13px;
       font-weight: 600;
       margin-bottom: 2px;
+      color: var(--text);
     }
+
     .link-desc {
       font-size: 11px;
-      color: #555;
+      color: var(--muted);
       font-family: 'DM Mono', monospace;
     }
 
     .link-arrow {
       margin-left: auto;
-      color: #333;
-      font-size: 16px;
+      color: var(--border2);
+      font-size: 18px;
       flex-shrink: 0;
+      transition: color 0.15s;
     }
 
-    .link-item:hover .link-arrow { color: #4a7c59; }
+    .link-item:hover .link-arrow {
+      color: var(--green);
+    }
 
+    /* ── Footer ── */
     .footer {
       text-align: center;
       font-size: 10px;
-      color: #333;
+      color: var(--label);
       letter-spacing: 1px;
       text-transform: uppercase;
       margin-top: 8px;
     }
 
-    /* Mobile responsive — already single-column, just tweak padding */
     @media (max-width: 480px) {
       body { padding: 24px 16px; }
     }
@@ -175,9 +278,34 @@
 <body>
   <div class="container">
 
+    <!-- Theme toggle -->
+    <div class="top-bar">
+      <button class="theme-btn" onclick="toggleTheme()" id="theme-btn" aria-label="Toggle light/dark mode">
+        <!-- Moon icon (dark mode) -->
+        <svg id="icon-dark" viewBox="0 0 24 24">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+        </svg>
+        <!-- Sun icon (light mode) — hidden initially -->
+        <svg id="icon-light" viewBox="0 0 24 24" style="display:none">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <span id="theme-label">Light</span>
+      </button>
+    </div>
+
+    <!-- Header -->
     <div class="header">
-      <div class="logo-mark">
-        <!-- Leaf / plant icon -->
+      <div class="logo-wrap">
+        <img
+          src="asset/growmate.png"
+          alt="Growmate Logo"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"
+        />
+        <!-- Fallback SVG leaf icon -->
         <svg viewBox="0 0 24 24">
           <path d="M12 22V12"/>
           <path d="M12 12C12 12 7 10 5 6c4 0 7 2 7 6z"/>
@@ -190,48 +318,46 @@
 
     <hr class="divider">
 
+    <!-- Social links -->
     <div class="section-label">Follow our project</div>
     <div class="links">
 
-      <a href="https://instagram.com/YOUR_IG_HANDLE" target="_blank" class="link-item">
+      <a href="https://instagram.com/YOUR_IG_HANDLE" target="_blank" rel="noopener" class="link-item">
         <div class="link-icon icon-ig">
-          <!-- Instagram icon -->
           <svg viewBox="0 0 24 24">
             <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
             <circle cx="12" cy="12" r="4"/>
-            <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
+            <circle cx="17.5" cy="6.5" r="0.5" fill="#c77dff" stroke="none"/>
           </svg>
         </div>
-        <div class="link-text">
+        <div>
           <div class="link-name">Instagram</div>
           <div class="link-desc">@YOUR_IG_HANDLE</div>
         </div>
         <span class="link-arrow">›</span>
       </a>
 
-      <a href="https://tiktok.com/@YOUR_TT_HANDLE" target="_blank" class="link-item">
+      <a href="https://tiktok.com/@YOUR_TT_HANDLE" target="_blank" rel="noopener" class="link-item">
         <div class="link-icon icon-tt">
-          <!-- TikTok icon (simplified) -->
           <svg viewBox="0 0 24 24">
             <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
           </svg>
         </div>
-        <div class="link-text">
+        <div>
           <div class="link-name">TikTok</div>
           <div class="link-desc">@YOUR_TT_HANDLE</div>
         </div>
         <span class="link-arrow">›</span>
       </a>
 
-      <a href="https://youtube.com/@YOUR_YT_HANDLE" target="_blank" class="link-item">
+      <a href="https://youtube.com/@YOUR_YT_HANDLE" target="_blank" rel="noopener" class="link-item">
         <div class="link-icon icon-yt">
-          <!-- YouTube icon -->
           <svg viewBox="0 0 24 24">
             <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/>
             <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#e05050" stroke="none"/>
           </svg>
         </div>
-        <div class="link-text">
+        <div>
           <div class="link-name">YouTube</div>
           <div class="link-desc">@YOUR_YT_HANDLE</div>
         </div>
@@ -240,35 +366,47 @@
 
     </div>
 
+    <!-- Project resource links -->
     <div class="section-label">Project resources</div>
     <div class="links">
 
-      <a href="https://github.com/YOUR_USERNAME/growmate" target="_blank" class="link-item">
+      <a href="https://github.com/hilmyah/Growmate" target="_blank" rel="noopener" class="link-item">
         <div class="link-icon icon-gh">
-          <!-- GitHub icon -->
           <svg viewBox="0 0 24 24">
             <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
           </svg>
         </div>
-        <div class="link-text">
-          <div class="link-name">GitHub</div>
-          <div class="link-desc">Source code &amp; wiring diagram</div>
+        <div>
+          <div class="link-name">Growmate</div>
+          <div class="link-desc">hilmyah/Growmate — firmware ESP8266</div>
         </div>
         <span class="link-arrow">›</span>
       </a>
 
-      <a href="http://growmate.local" target="_blank" class="link-item">
+      <a href="https://github.com/hilmyah/Growbot" target="_blank" rel="noopener" class="link-item">
+        <div class="link-icon icon-gh2">
+          <svg viewBox="0 0 24 24">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+          </svg>
+        </div>
+        <div>
+          <div class="link-name">Growbot</div>
+          <div class="link-desc">hilmyah/Growbot — WhatsApp gateway</div>
+        </div>
+        <span class="link-arrow">›</span>
+      </a>
+
+      <a href="http://growmate.local" target="_blank" rel="noopener" class="link-item">
         <div class="link-icon icon-web">
-          <!-- Monitor/device icon -->
           <svg viewBox="0 0 24 24">
             <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
             <line x1="8" y1="21" x2="16" y2="21"/>
             <line x1="12" y1="17" x2="12" y2="21"/>
           </svg>
         </div>
-        <div class="link-text">
+        <div>
           <div class="link-name">Live Dashboard</div>
-          <div class="link-desc">growmate.local (same network)</div>
+          <div class="link-desc">growmate.local — same network only</div>
         </div>
         <span class="link-arrow">›</span>
       </a>
@@ -278,5 +416,28 @@
     <div class="footer">Growmate &nbsp;&middot;&nbsp; PKK &nbsp;&middot;&nbsp; 2025</div>
 
   </div>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      document.getElementById('icon-dark').style.display  = isDark ? 'none'  : 'block';
+      document.getElementById('icon-light').style.display = isDark ? 'block' : 'none';
+      document.getElementById('theme-label').textContent  = isDark ? 'Dark'  : 'Light';
+      localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    }
+
+    // Restore saved theme preference
+    (function() {
+      const saved = localStorage.getItem('theme');
+      if (saved && saved !== 'dark') {
+        document.documentElement.setAttribute('data-theme', saved);
+        document.getElementById('icon-dark').style.display  = 'none';
+        document.getElementById('icon-light').style.display = 'block';
+        document.getElementById('theme-label').textContent  = 'Dark';
+      }
+    })();
+  </script>
 </body>
 </html>
