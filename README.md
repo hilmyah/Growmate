@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="asset/growmate.png" alt="Growmate Logo" width="180"/>
+  <img src="asset/growmate1.png" alt="Growmate Logo" width="180"/>
   <h1>Growmate</h1>
   <p>Sistem irigasi cerdas berbasis ESP8266 dengan Web Dashboard, Blynk, dan bot WhatsApp</p>
   <p>
