@@ -5,9 +5,9 @@
 //            light/dark mode toggle, custom presets
 // =============================================================
 
-#define BLYNK_TEMPLATE_ID   "TMPL6BQ_wZk2b"
-#define BLYNK_TEMPLATE_NAME "PKK Grafik"
-#define BLYNK_AUTH_TOKEN    "W1yClSQOJchmJ-WBRJeuzRpJgNsrKQSg"
+#define BLYNK_TEMPLATE_ID   "<YOUR_TEMPLATE_ID>"
+#define BLYNK_TEMPLATE_NAME "<YOUR_TEMPLATE_NAME>"
+#define BLYNK_AUTH_TOKEN    "<YOUR_BLYNK_TOKEN>"
 #define BLYNK_PRINT         Serial
 
 #include <ESP8266WiFi.h>
@@ -20,8 +20,8 @@
 // -------------------------------------------------------------
 //  WiFi credentials
 // -------------------------------------------------------------
-const char* ssid     = "fh_0ac9e8";
-const char* password = "wlanf53617";
+const char* ssid     = "<YOUR_WIFI_SSID>";
+const char* password = "<YOUR_WIFI_PASSWORD>";
 
 // -------------------------------------------------------------
 //  Hardware pins
