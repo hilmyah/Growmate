@@ -8,7 +8,7 @@
 
 #define BLYNK_TEMPLATE_ID   "<YOUR_BLYNK_TEMPLATE_ID>"
 #define BLYNK_TEMPLATE_NAME "<YOUR_BLYNK_TEMPLATE_NAME>"
-#define BLYNK_AUTH_TOKEN    "YOUR_BLYNK_AUTH_TOKEN"
+#define BLYNK_AUTH_TOKEN    "<YOUR_BLYNK_AUTH_TOKEN>"
 #define BLYNK_PRINT         Serial
 
 #include <ESP8266WiFi.h>
@@ -23,7 +23,7 @@
 // -------------------------------------------------------------
 //  WiFi credentials
 // -------------------------------------------------------------
-const char* ssid     = "<YOUR_SSID>";
+const char* ssid     = "<YOUR_WIFI_SSID>";
 const char* password = "<YOUR_WIFI_PASSWORD>";
 
 // -------------------------------------------------------------
@@ -197,7 +197,6 @@ void updateLCD() {
   lcdPrint16(1, r1);
 }
 
-
 // =============================================================
 //  HTML Dashboard
 // =============================================================
@@ -251,7 +250,7 @@ const char MAIN_page[] PROGMEM =
 ".aa{background:rgba(52,130,200,.1)!important;border-color:#3482c8!important;color:#3482c8!important;}"
 ".ao{background:rgba(74,124,89,.12)!important;border-color:var(--g)!important;color:var(--gh)!important;}"
 ".af{background:rgba(160,48,48,.1)!important;border-color:var(--rd)!important;color:var(--rd)!important;}"
-".sh{display:flex;justify-content:space-between;font-size:10px;color:var(--tl);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}"
+".sh{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--tl);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}"
 ".sh span{font-family:'DM Mono',monospace;color:var(--gh);font-size:11px;letter-spacing:0;text-transform:none;}"
 "input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--bd2);border-radius:2px;outline:none;cursor:pointer;}"
 "input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gh);cursor:pointer;border:2px solid var(--thumb-border);}"
@@ -290,6 +289,8 @@ const char MAIN_page[] PROGMEM =
 ".chart-wrap{margin-top:12px;position:relative;height:90px;}"
 ".xax{display:flex;justify-content:space-between;margin-top:4px;}"
 ".xax span{font-family:'DM Mono',monospace;font-size:9px;color:var(--tl);}"
+".adj-btn{padding:0 8px;height:22px;font-size:14px;line-height:1;border-radius:4px;border:1px solid var(--bd2);background:var(--s2);color:var(--tx);cursor:pointer;font-weight:bold;}"
+".adj-btn:hover{border-color:var(--g);}"
 "</style></head><body>"
 "<div class='hdr'>"
 "<div class='hdr-left'><h1>Growmate</h1><p>Irrigation monitoring system</p></div>"
@@ -325,7 +326,12 @@ const char MAIN_page[] PROGMEM =
 "<button id='btnOn'   class='cbtn' onclick=\"cmd('/on')\">ON</button>"
 "<button id='btnOff'  class='cbtn' onclick=\"cmd('/off')\">OFF</button>"
 "</div>"
-"<div class='sh'><span style='font-family:\"DM Sans\",sans-serif;font-size:10px;color:var(--tl);letter-spacing:1px'>Threshold</span><span id='thrVal'>--</span></div>"
+"<div class='sh'><span style='font-family:\"DM Sans\",sans-serif;font-size:10px;color:var(--tl);letter-spacing:1px'>Threshold</span>"
+"<div style='display:flex;align-items:center;gap:8px'>"
+"<button class='adj-btn' onclick='adj(-5)'>-</button>"
+"<span id='thrVal'>--</span>"
+"<button class='adj-btn' onclick='adj(5)'>+</button>"
+"</div></div>"
 "<input type='range' id='thrSlider' min='200' max='1024' value='700' step='1' oninput='onSlider(this.value)'>"
 "</div>"
 "<div class='card full'>"
@@ -361,6 +367,7 @@ const char MAIN_page[] PROGMEM =
 "function savePreset(){const n=document.getElementById('inName').value.trim();const t=parseInt(document.getElementById('inThr').value);if(!n){document.getElementById('formErr').classList.add('show');return;}custom.push({n,t});closeForm();renderPresets();saveCustom();}"
 "function saveCustom(){fetch('/api/presets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(custom)});}"
 "function onSlider(v){document.getElementById('thrVal').innerText=v;selIdx=null;renderPresets();fetch('/api/threshold?val='+v);}"
+"function adj(d){let s=document.getElementById('thrSlider');let v=parseInt(s.value)+d;v=Math.max(200,Math.min(1024,v));s.value=v;onSlider(v);}"
 "function cmd(url){fetch(url).then(()=>poll());}"
 "function fmtTime(s){if(s===0)return'Just now';if(s<60)return s+'s ago';return Math.floor(s/60)+'m '+(s%60)+'s ago';}"
 "const ctx=document.getElementById('soilChart').getContext('2d');"
@@ -374,7 +381,6 @@ const char MAIN_page[] PROGMEM =
 "fetch('/api/presets').then(r=>r.json()).then(d=>{custom=d;renderPresets();}).catch(()=>renderPresets());"
 "setInterval(poll,2000);poll();"
 "</script></body></html>";
-
 
 // =============================================================
 //  Web server handlers
