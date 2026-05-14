@@ -1,7 +1,7 @@
 <div align="center">
   <img src="asset/growmate1.png" alt="Growmate Logo" width="180"/>
   <h1>Growmate</h1>
-  <p>Sistem irigasi cerdas berbasis ESP8266 dengan Web Dashboard, Blynk, dan bot WhatsApp</p>
+  <p>Sistem irigasi cerdas berbasis WEMOS D1 Mini / ESP8266 dengan Web Dashboard, LCD, Blynk, dan bot WhatsApp</p>
   <p>
     <a href="https://github.com/hilmyah/Growbot">🤖 Growbot — WhatsApp Gateway</a>
   </p>
@@ -18,7 +18,7 @@
 - [Tahap 1 — Persiapan Arduino IDE](#tahap-1--persiapan-arduino-ide)
 - [Tahap 2 — Setup Blynk](#tahap-2--setup-blynk)
 - [Tahap 3 — Konfigurasi Firmware](#tahap-3--konfigurasi-firmware)
-- [Tahap 4 — Upload ke ESP8266](#tahap-4--upload-ke-esp8266)
+- [Tahap 4 — Upload ke WEMOS D1 Mini](#tahap-4--upload-ke-wemos-d1-mini)
 - [Tahap 5 — Remote Access](#tahap-5--remote-access)
 - [Penjelasan Kode](#penjelasan-kode)
 - [API Endpoint ESP8266](#api-endpoint-esp8266)
@@ -27,12 +27,13 @@
 
 ## Tentang Proyek
 
-Growmate adalah firmware untuk NodeMCU / ESP8266 yang mengotomasi penyiraman tanaman berdasarkan pembacaan sensor kelembaban tanah. Sistem dapat diakses melalui tiga antarmuka: **Web Dashboard** yang berjalan langsung di ESP8266, **aplikasi Blynk** di smartphone, dan **bot WhatsApp** melalui [Growbot](https://github.com/hilmyah/Growbot).
+Growmate adalah firmware untuk **WEMOS D1 Mini / ESP8266** yang mengotomasi penyiraman tanaman berdasarkan pembacaan sensor kelembaban tanah. Status sistem ditampilkan secara real-time di **layar LCD I2C** yang terpasang langsung pada modul. Sistem juga dapat diakses melalui tiga antarmuka sekaligus: **Web Dashboard** yang berjalan langsung di ESP8266, **aplikasi Blynk** di smartphone, dan **bot WhatsApp** melalui [Growbot](https://github.com/hilmyah/Growbot).
 
 ---
 
 ## Fitur
 
+- **LCD I2C real-time** — menampilkan nilai ADC, persentase kelembaban, kondisi tanah, status pompa, dan mode langsung di layar fisik.
 - **Pembacaan sensor real-time** — nilai ADC (0–1024) dan persentase kelembaban ditampilkan di dashboard.
 - **Mode otomatis** — pompa menyala/mati otomatis berdasarkan nilai threshold yang dapat dikustomisasi.
 - **Mode manual** — kontrol pompa langsung dengan timer otomatis 60 detik sebagai pengaman.
@@ -54,7 +55,8 @@ Growmate/
 ├── growmate/
 │   └── growmate.ino      # Firmware utama ESP8266
 ├── asset/
-│   ├── growmate.png      # Logo proyek
+│   ├── growmate.png      # Logo proyek (ikon)
+│   ├── growmate1.png     # Logo proyek (full)
 │   └── growmate.svg      # Logo versi vektor
 ├── index.html            # Halaman link proyek (portal publik)
 └── README.md
@@ -67,7 +69,8 @@ Growmate/
 | `loadFromEEPROM()` | Membaca threshold dan preset tanaman dari EEPROM saat boot |
 | `saveThreshold()` | Menyimpan nilai threshold ke EEPROM setiap kali diubah |
 | `savePresetsToEEPROM()` | Menyimpan seluruh data preset tanaman ke EEPROM |
-| `updatePumpState()` | Mengontrol relay pompa dan memperbarui status ke Blynk |
+| `updateLCD()` | Memperbarui tampilan LCD I2C dengan data sensor terkini (ADC, %, kondisi, mode, pompa) |
+| `updatePumpState()` | Mengontrol relay pompa dan memperbarui status ke Blynk dan LCD |
 | `MAIN_page[]` | Halaman HTML dashboard (inline di PROGMEM, mendukung light/dark mode dan Chart.js) |
 | `handleApi()` | Endpoint `/api/data` — mengembalikan JSON status sensor dan sistem |
 | `handleSetThreshold()` | Endpoint `/api/threshold` — mengubah nilai threshold secara dinamis |
@@ -76,7 +79,7 @@ Growmate/
 | `handleGetHistory()` | Endpoint `/api/history` — mengembalikan 5 data kelembaban terakhir |
 | `sendToBlynk()` | Timer 1 detik — mengirim data sensor ke virtual pin Blynk |
 | `BLYNK_WRITE(V3)` | Handler kontrol pompa dari tombol di aplikasi Blynk |
-| `loop()` | Mengelola OTA, mDNS, Blynk, logika auto mode, dan timeout manual |
+| `loop()` | Mengelola OTA, mDNS, Blynk, LCD, logika auto mode, dan timeout manual |
 
 ---
 
@@ -84,16 +87,21 @@ Growmate/
 
 **Perangkat keras:**
 
-- NodeMCU / ESP8266
-- Sensor kelembaban tanah (soil moisture sensor) — pin `A0`
-- Relay module — pin `D4` (GPIO 2, aktif LOW)
-- Pompa air mini DC
+| Komponen | Keterangan |
+|---|---|
+| WEMOS D1 Mini / NodeMCU ESP8266 | Mikrokontroler utama |
+| Sensor kelembaban tanah (soil moisture) | Terhubung ke pin `A0` |
+| Relay module | Pin `D4` / GPIO 2, aktif LOW |
+| LCD I2C 16×2 | Terhubung ke SDA (`D2`) dan SCL (`D1`) |
+| Pompa air mini DC | Dikontrol via relay |
+
+> **Catatan board:** README ini menggunakan **LOLIN (WEMOS) D1 R2 & Mini** sebagai target utama. NodeMCU 1.0 juga kompatibel dengan konfigurasi pin yang sama.
 
 **Perangkat lunak:**
 
 - [Arduino IDE](https://www.arduino.cc/en/software) versi 1.8 ke atas (atau Arduino IDE 2.x)
 - Board package ESP8266 untuk Arduino IDE
-- Library: `Blynk`, `ESP8266WiFi`, `ESP8266WebServer`, `ESP8266mDNS`, `ArduinoOTA`, `EEPROM`
+- Library: `Blynk`, `LiquidCrystal_I2C`, `Wire`, `ESP8266WiFi`, `ESP8266WebServer`, `ESP8266mDNS`, `ArduinoOTA`, `EEPROM`
 - Akun [Blynk](https://blynk.io) (gratis)
 
 ---
@@ -108,22 +116,22 @@ Growmate/
    https://arduino.esp8266.com/stable/package_esp8266com_index.json
    ```
 3. Buka **Tools → Board → Boards Manager**, cari `esp8266`, instal paket **ESP8266 by ESP8266 Community**.
-4. Pilih board: **Tools → Board → ESP8266 Boards → NodeMCU 1.0 (ESP-12E Module)**.
+4. Pilih board: **Tools → Board → ESP8266 Boards → LOLIN(WEMOS) D1 R2 & Mini**.
 
 ### Instal library yang dibutuhkan
 
 Buka **Sketch → Include Library → Manage Libraries**, lalu cari dan instal:
 
-| Library | Catatan |
-|---|---|
-| `Blynk` | Cari "Blynk" oleh Volodymyr Shymanskyy, versi 1.3.x ke atas |
-| `ESP8266WiFi` | Sudah termasuk dalam board package ESP8266 |
-| `ESP8266WebServer` | Sudah termasuk dalam board package ESP8266 |
-| `ESP8266mDNS` | Sudah termasuk dalam board package ESP8266 |
-| `ArduinoOTA` | Sudah termasuk dalam board package ESP8266 |
-| `EEPROM` | Sudah termasuk dalam board package ESP8266 |
-
-> Library yang sudah termasuk dalam board package tidak perlu diinstal terpisah — akan tersedia otomatis setelah board package ESP8266 terpasang.
+| Library | Sumber | Catatan |
+|---|---|---|
+| `Blynk` | Library Manager | Cari "Blynk" oleh Volodymyr Shymanskyy, versi 1.3.x ke atas |
+| `LiquidCrystal I2C` | Library Manager | Cari "LiquidCrystal I2C" oleh Frank de Brabander |
+| `ESP8266WiFi` | Board package | Otomatis tersedia setelah board package terinstal |
+| `ESP8266WebServer` | Board package | Otomatis tersedia |
+| `ESP8266mDNS` | Board package | Otomatis tersedia |
+| `ArduinoOTA` | Board package | Otomatis tersedia |
+| `Wire` | Built-in | Otomatis tersedia (untuk I2C) |
+| `EEPROM` | Board package | Otomatis tersedia |
 
 ---
 
@@ -149,7 +157,7 @@ Blynk digunakan untuk memantau dan mengontrol sistem dari aplikasi smartphone.
    - **Template ID** (format: `TMPLxxxxxxxxxx`)
    - **Template Name**
    - **Auth Token**
-5. (Opsional) Tambahkan widget di aplikasi Blynk untuk visualisasi:
+5. (Opsional) Tambahkan widget di aplikasi Blynk:
    - **Gauge** atau **Value Display** → V0, V2
    - **Label** → V1
    - **Button** (mode Switch) → V3
@@ -175,15 +183,20 @@ const char* ssid     = "NamaWiFiKamu";    // SSID jaringan WiFi 2.4 GHz
 const char* password = "PasswordWiFi";    // Password WiFi
 ```
 
-> ESP8266 hanya mendukung jaringan WiFi **2.4 GHz**. Pastikan tidak menggunakan jaringan 5 GHz.
+> ESP8266 / WEMOS D1 Mini hanya mendukung jaringan WiFi **2.4 GHz**. Pastikan tidak menggunakan jaringan 5 GHz.
 
 ### 3.3 Konfigurasi pin hardware
 
-Sesuaikan jika menggunakan wiring yang berbeda:
-
 ```cpp
 const int soilPin  = A0;   // Pin sensor kelembaban (hanya A0 yang tersedia untuk ADC)
-const int relayPin = 2;    // GPIO 2 = pin D4 pada NodeMCU, relay aktif LOW
+const int relayPin = 2;    // GPIO 2 = pin D4 pada WEMOS D1 Mini, relay aktif LOW
+```
+
+Konfigurasi LCD I2C (sesuaikan alamat I2C jika berbeda):
+
+```cpp
+LiquidCrystal_I2C lcd(0x27, 16, 2);   // Alamat I2C 0x27, LCD 16 kolom 2 baris
+// Jika LCD tidak tampil, coba alamat 0x3F
 ```
 
 ### 3.4 Nilai threshold default
@@ -192,7 +205,7 @@ const int relayPin = 2;    // GPIO 2 = pin D4 pada NodeMCU, relay aktif LOW
 int threshold = 700;   // Rentang valid: 0–1024
 ```
 
-Nilai ini hanya berlaku saat pertama kali upload (EEPROM kosong). Setelahnya, threshold yang tersimpan di EEPROM akan digunakan. Threshold dapat diubah sewaktu-waktu dari dashboard web atau bot WhatsApp tanpa perlu upload ulang firmware.
+Nilai ini hanya berlaku saat pertama kali upload (EEPROM kosong). Setelahnya, nilai tersimpan di EEPROM yang digunakan. Threshold dapat diubah dari dashboard web, Blynk, atau bot WhatsApp tanpa perlu upload ulang firmware.
 
 **Panduan nilai threshold:**
 
@@ -201,27 +214,26 @@ Nilai ini hanya berlaku saat pertama kali upload (EEPROM kosong). Setelahnya, th
 | 200–400 | Target tanah sangat basah |
 | 500–700 | Target tanah normal / sedang |
 | 700–900 | Target tanah agak kering sebelum disiram |
-| 900–1024 | Target tanah sangat kering (sensor di udara terbuka) |
+| 900–1024 | Target tanah sangat kering (sensor di udara) |
 
 ---
 
-## Tahap 4 — Upload ke ESP8266
+## Tahap 4 — Upload ke WEMOS D1 Mini
 
-1. Hubungkan NodeMCU ke komputer menggunakan kabel USB (pastikan kabel mendukung data, bukan hanya charging).
+1. Hubungkan WEMOS D1 Mini ke komputer menggunakan kabel USB Micro-B (pastikan kabel mendukung data, bukan hanya charging).
 2. Di Arduino IDE, pastikan pengaturan berikut sudah benar:
 
    | Pengaturan | Nilai |
    |---|---|
-   | Board | NodeMCU 1.0 (ESP-12E Module) |
+   | Board | LOLIN(WEMOS) D1 R2 & Mini |
    | Upload Speed | 115200 |
    | Port | Pilih port COM yang muncul |
 
    > Windows: port biasanya bernama `COM3`, `COM4`, dst. Mac/Linux: `/dev/ttyUSB0` atau `/dev/cu.usbserial-...`
 
 3. Klik tombol **Upload** dan tunggu hingga muncul pesan `Done uploading`.
-4. Buka **Serial Monitor** (Tools → Serial Monitor atau Ctrl+Shift+M).
-5. Atur baud rate ke **115200**.
-6. Setelah terhubung ke WiFi, Serial Monitor akan menampilkan:
+4. Buka **Serial Monitor** (Tools → Serial Monitor atau Ctrl+Shift+M), atur baud rate ke **115200**.
+5. Setelah terhubung ke WiFi, Serial Monitor akan menampilkan:
 
    ```
    EEPROM loaded — threshold: 700, presets: 0
@@ -230,8 +242,11 @@ Nilai ini hanya berlaku saat pertama kali upload (EEPROM kosong). Setelahnya, th
    System ready — http://192.168.1.X
    ```
 
-7. Catat **IP lokal ESP8266** yang tertera — diperlukan untuk konfigurasi tunnel di tahap berikutnya.
+6. LCD akan menyala dan menampilkan data sensor secara real-time.
+7. Catat **IP lokal ESP8266** — diperlukan untuk konfigurasi tunnel di tahap berikutnya.
 8. Buka browser di perangkat yang terhubung ke WiFi yang sama, akses `http://growmate.local` atau `http://192.168.1.X` untuk memverifikasi dashboard berjalan.
+
+> **Troubleshooting LCD:** Jika LCD tidak menampilkan teks, periksa alamat I2C dengan sketch `I2C Scanner`. Alamat yang umum adalah `0x27` atau `0x3F`.
 
 ---
 
@@ -283,11 +298,31 @@ sudo tailscale up --advertise-routes=192.168.1.0/24
 tailscale up --advertise-routes=192.168.1.0/24
 ```
 
-Setujui route di [Tailscale Admin Console](https://login.tailscale.com/admin/machines), lalu gunakan IP lokal ESP8266 langsung sebagai `ESP_URL` di Growbot.
+Setujui route di [Tailscale Admin Console](https://login.tailscale.com/admin/machines), lalu gunakan IP lokal ESP8266 langsung sebagai `ESP_URL` di Growbot:
+
+```ini
+ESP_URL=http://192.168.1.X
+```
 
 ---
 
 ## Penjelasan Kode
+
+### Tampilan LCD
+
+LCD I2C diperbarui setiap detik bersama dengan pengiriman data ke Blynk. Baris pertama menampilkan nilai ADC dan persentase kelembaban, baris kedua menampilkan kondisi tanah dan status pompa:
+
+```
+ADC:732  Hum:28%
+KERING | P:ON
+```
+
+Jika sistem dalam mode Manual, indikator mode ditampilkan menggantikan kondisi:
+
+```
+ADC:732  Hum:28%
+MANUAL | P:ON
+```
 
 ### Logika mode otomatis
 
@@ -318,7 +353,7 @@ Total EEPROM yang digunakan: 153 byte dari 512 byte yang dialokasikan.
 
 ### Koneksi Blynk non-blocking
 
-Blynk dijalankan secara non-blocking: jika koneksi ke server Blynk terputus, sistem mencoba reconnect setiap 10 detik tanpa menghentikan web server atau pembacaan sensor.
+Blynk dijalankan secara non-blocking: jika koneksi ke server Blynk terputus, sistem mencoba reconnect setiap 10 detik tanpa menghentikan web server, pembacaan sensor, atau tampilan LCD.
 
 ```cpp
 } else if (millis() - lastBlynkReconnect > 10000) {
