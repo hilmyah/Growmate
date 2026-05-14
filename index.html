@@ -238,7 +238,6 @@
     }
 
     .link-arrow {
-      margin-left: auto;
       color: var(--border2);
       font-size: 18px;
       flex-shrink: 0;
@@ -247,6 +246,25 @@
 
     .link-item:hover .link-arrow {
       color: var(--green);
+    }
+
+    .pts-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      background: var(--btn-bg);
+      color: var(--muted);
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border2);
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .pts-badge.claimed {
+      background: var(--green-dim);
+      color: var(--green-hi);
+      border-color: var(--green);
     }
 
     /* ── Footer ── */
@@ -302,10 +320,15 @@
 
   <div class="container">
 
-    <div class="section-label">Follow our project</div>
+    <div class="section-label" style="display: flex; justify-content: space-between; align-items: center;">
+      <span>Follow our project</span>
+      <span style="font-family: 'DM Mono', monospace; font-size: 11px; color: var(--green-hi); font-weight: 600; text-transform: none; letter-spacing: 0.5px;">
+        Points: <span id="total-points">0</span> / 100
+      </span>
+    </div>
     <div class="links">
 
-      <a href="https://www.instagram.com/reel/DYT1CX6PfJT/?igsh=cnJlbzg2dXB3NHRv" target="_blank" rel="noopener" class="link-item">
+      <a href="https://www.instagram.com/reel/DYT1CX6PfJT/?igsh=cnJlbzg2dXB3NHRv" target="_blank" rel="noopener" class="link-item" onclick="claimPoint('ig')">
         <div class="link-icon icon-ig">
           <svg viewBox="0 0 24 24">
             <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
@@ -317,10 +340,13 @@
           <div class="link-name">Instagram</div>
           <div class="link-desc">Muhamad Haikal Al Yasir</div>
         </div>
-        <span class="link-arrow">›</span>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+          <div class="pts-badge" id="badge-ig">+30 Pts</div>
+          <span class="link-arrow">›</span>
+        </div>
       </a>
 
-      <a href="https://vt.tiktok.com/ZSxe4FLLL/" target="_blank" rel="noopener" class="link-item">
+      <a href="https://vt.tiktok.com/ZSxe4FLLL/" target="_blank" rel="noopener" class="link-item" onclick="claimPoint('tt')">
         <div class="link-icon icon-tt">
           <svg viewBox="0 0 24 24">
             <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
@@ -330,10 +356,13 @@
           <div class="link-name">TikTok</div>
           <div class="link-desc">Romeero Nayotama Ramadhan</div>
         </div>
-        <span class="link-arrow">›</span>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+          <div class="pts-badge" id="badge-tt">+20 Pts</div>
+          <span class="link-arrow">›</span>
+        </div>
       </a>
 
-      <a href="https://youtube.com/shorts/B8ubMYCogIE?feature=share" target="_blank" rel="noopener" class="link-item">
+      <a href="https://youtube.com/shorts/B8ubMYCogIE?feature=share" target="_blank" rel="noopener" class="link-item" onclick="claimPoint('yt')">
         <div class="link-icon icon-yt">
           <svg viewBox="0 0 24 24">
             <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/>
@@ -344,7 +373,10 @@
           <div class="link-name">YouTube</div>
           <div class="link-desc">Hilmy Adhyandra Hamzah</div>
         </div>
-        <span class="link-arrow">›</span>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+          <div class="pts-badge" id="badge-yt">+50 Pts</div>
+          <span class="link-arrow">›</span>
+        </div>
       </a>
 
     </div>
@@ -362,7 +394,7 @@
           <div class="link-name">Growmate</div>
           <div class="link-desc">hilmyah/Growmate — firmware ESP8266</div>
         </div>
-        <span class="link-arrow">›</span>
+        <span class="link-arrow" style="margin-left: auto;">›</span>
       </a>
 
       <a href="https://github.com/hilmyah/Growbot" target="_blank" rel="noopener" class="link-item">
@@ -375,7 +407,7 @@
           <div class="link-name">Growbot</div>
           <div class="link-desc">hilmyah/Growbot — WhatsApp gateway</div>
         </div>
-        <span class="link-arrow">›</span>
+        <span class="link-arrow" style="margin-left: auto;">›</span>
       </a>
 
       <a href="http://growmate.local" target="_blank" rel="noopener" class="link-item">
@@ -390,7 +422,7 @@
           <div class="link-name">Live Dashboard</div>
           <div class="link-desc">growmate.local — same network only</div>
         </div>
-        <span class="link-arrow">›</span>
+        <span class="link-arrow" style="margin-left: auto;">›</span>
       </a>
 
     </div>
@@ -419,6 +451,53 @@
         document.getElementById('theme-label').textContent  = 'Dark';
       }
     })();
+
+    // --- Sistem Poin ---
+    const POINT_VALUES = { ig: 30, tt: 20, yt: 50 };
+    let claimedPoints = { ig: false, tt: false, yt: false };
+
+    function initPoints() {
+      const saved = localStorage.getItem('growmate_points');
+      if (saved) {
+        claimedPoints = JSON.parse(saved);
+      }
+      updatePointsUI();
+    }
+
+    function claimPoint(platform) {
+      if (!claimedPoints[platform]) {
+        claimedPoints[platform] = true;
+        localStorage.setItem('growmate_points', JSON.stringify(claimedPoints));
+        
+        updatePointsUI();
+        
+        alert(`Terima kasih telah mengunjungi! Pastikan Anda sudah memberikan Like & Comment untuk memastikan poin ini valid.`);
+      }
+    }
+
+    function updatePointsUI() {
+      let total = 0;
+      for (const key in claimedPoints) {
+        const badge = document.getElementById(`badge-${key}`);
+        if (claimedPoints[key]) {
+          total += POINT_VALUES[key];
+          if (badge) {
+            badge.classList.add('claimed');
+            badge.textContent = '✓ Claimed';
+          }
+        } else {
+          if (badge) {
+            badge.classList.remove('claimed');
+            badge.textContent = `+${POINT_VALUES[key]} Pts`;
+          }
+        }
+      }
+      document.getElementById('total-points').textContent = total;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initPoints();
+    });
   </script>
 </body>
 </html>
