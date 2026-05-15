@@ -218,6 +218,8 @@
     .icon-web svg { stroke: var(--green-hi); }
     .icon-wa  { background: #0a1a10; }
     .icon-wa svg { stroke: #25D366; }
+    .icon-tg  { background: #0a141a; }
+    .icon-tg svg { stroke: #24A1DE; }
 
     [data-theme="light"] .icon-ig  { background: #f3ecff; }
     [data-theme="light"] .icon-tt  { background: #e8fafa; }
@@ -226,6 +228,7 @@
     [data-theme="light"] .icon-gh2 { background: #eef4ff; }
     [data-theme="light"] .icon-web { background: var(--green-dim); }
     [data-theme="light"] .icon-wa  { background: #e8f5e9; }
+    [data-theme="light"] .icon-tg  { background: #e8f4f8; }
 
     .link-name {
       font-size: 13px;
@@ -241,6 +244,7 @@
     }
 
     .link-arrow {
+      margin-left: auto;
       color: var(--border2);
       font-size: 18px;
       flex-shrink: 0;
@@ -345,7 +349,7 @@
         </div>
         <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
           <div class="pts-badge" id="badge-ig">+30 Pts</div>
-          <span class="link-arrow">›</span>
+          <span class="link-arrow" style="margin-left: 0;">›</span>
         </div>
       </a>
 
@@ -361,7 +365,7 @@
         </div>
         <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
           <div class="pts-badge" id="badge-tt">+20 Pts</div>
-          <span class="link-arrow">›</span>
+          <span class="link-arrow" style="margin-left: 0;">›</span>
         </div>
       </a>
 
@@ -378,7 +382,7 @@
         </div>
         <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
           <div class="pts-badge" id="badge-yt">+50 Pts</div>
-          <span class="link-arrow">›</span>
+          <span class="link-arrow" style="margin-left: 0;">›</span>
         </div>
       </a>
 
@@ -397,7 +401,7 @@
           <div class="link-name">Growmate</div>
           <div class="link-desc">hilmyah/Growmate — firmware ESP8266</div>
         </div>
-        <span class="link-arrow" style="margin-left: auto;">›</span>
+        <span class="link-arrow">›</span>
       </a>
 
       <a href="https://github.com/hilmyah/Growbot" target="_blank" rel="noopener" class="link-item">
@@ -408,9 +412,9 @@
         </div>
         <div>
           <div class="link-name">Growbot</div>
-          <div class="link-desc">hilmyah/Growbot — WhatsApp gateway</div>
+          <div class="link-desc">hilmyah/Growbot — Node.js gateway</div>
         </div>
-        <span class="link-arrow" style="margin-left: auto;">›</span>
+        <span class="link-arrow">›</span>
       </a>
 
       <a href="https://wa.me/6285846292213" target="_blank" rel="noopener" class="link-item">
@@ -421,9 +425,23 @@
         </div>
         <div>
           <div class="link-name">Growbot WhatsApp</div>
-          <div class="link-desc">+62 858-4629-2213 — Chat with our bot</div>
+          <div class="link-desc">+62 858-4629-2213 — (Sedang Ditinjau)</div>
         </div>
-        <span class="link-arrow" style="margin-left: auto;">›</span>
+        <span class="link-arrow">›</span>
+      </a>
+
+      <a href="https://t.me/Growchtbot" target="_blank" rel="noopener" class="link-item">
+        <div class="link-icon icon-tg">
+          <svg viewBox="0 0 24 24">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </div>
+        <div>
+          <div class="link-name">Growbot Telegram</div>
+          <div class="link-desc">@Growchtbot — Chat with our bot</div>
+        </div>
+        <span class="link-arrow">›</span>
       </a>
 
       <a href="http://10.215.221.252" target="_blank" rel="noopener" class="link-item">
@@ -438,7 +456,7 @@
           <div class="link-name">Live Dashboard</div>
           <div class="link-desc">growmate.local — same network only</div>
         </div>
-        <span class="link-arrow" style="margin-left: auto;">›</span>
+        <span class="link-arrow">›</span>
       </a>
 
     </div>
