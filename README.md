@@ -37,10 +37,11 @@ Growmate adalah firmware untuk **WEMOS D1 Mini / ESP8266** yang mengotomasi peny
 - **Pembacaan sensor real-time** — nilai ADC (0–1024) dan persentase kelembaban ditampilkan di dashboard.
 - **Mode otomatis** — pompa menyala/mati berdasarkan nilai threshold dengan hysteresis ±20 ADC.
 - **Mode manual** — kontrol pompa langsung dengan timer otomatis 60 detik sebagai pengaman.
+- **Jadwal penyiraman** — interval penyiraman terjadwal (menit hingga mingguan) yang persisten di EEPROM; dapat diatur dari dashboard web maupun bot Growbot.
 - **Light / dark mode** — dashboard web dengan toggle tema terang dan gelap, tersimpan di browser.
 - **Grafik historis** — riwayat 40 pembacaan kelembaban terakhir dalam bentuk chart.
 - **Preset tanaman** — 10 preset bawaan, dapat ditambah hingga 10 preset kustom via dashboard atau bot.
-- **Persistensi EEPROM** — threshold dan preset tersimpan dan tidak hilang saat restart.
+- **Persistensi EEPROM** — threshold, preset, dan jadwal tersimpan dan tidak hilang saat restart.
 - **mDNS** — akses dashboard via `http://growmate.local` tanpa perlu mengingat IP.
 - **OTA update** — upload firmware baru tanpa kabel melalui jaringan WiFi.
 - **Integrasi Blynk** — pantau dan kontrol pompa dari aplikasi Blynk (V0, V1, V2, V3).
@@ -57,7 +58,7 @@ Growmate/
 ├── asset/
 │   ├── growmate.png      # Logo proyek (ikon)
 │   ├── growmate1.png     # Logo proyek (full)
-│   ├── flowchart.png     # Diagram alur sistem
+│   ├── flowchart.png     # Diagram alur sistem (PNG)
 │   └── growmate.svg      # Logo versi vektor
 ├── index.html            # Halaman link proyek (portal publik / QR pamflet)
 └── README.md
@@ -67,20 +68,22 @@ Growmate/
 
 | Fungsi / Bagian | Keterangan |
 |---|---|
-| `loadFromEEPROM()` | Membaca threshold dan preset dari EEPROM saat boot |
+| `loadFromEEPROM()` | Membaca threshold, preset, dan jadwal dari EEPROM saat boot |
 | `saveThreshold()` | Menyimpan nilai threshold ke EEPROM setiap kali diubah |
 | `savePresetsToEEPROM()` | Menyimpan seluruh data preset ke EEPROM |
+| `saveScheduleToEEPROM()` | Menyimpan konfigurasi jadwal penyiraman ke EEPROM |
 | `updateLCD()` | Memperbarui tampilan LCD — 3 halaman bergantian tiap 3 detik |
 | `updatePumpState()` | Mengontrol relay pompa dan memperbarui status ke Blynk |
 | `MAIN_page[]` | Halaman HTML dashboard (inline di PROGMEM, light/dark mode, Chart.js) |
-| `handleApi()` | Endpoint `/api/data` — JSON status sensor dan sistem |
+| `handleApi()` | Endpoint `/api/data` — JSON status sensor, sistem, dan jadwal |
 | `handleSetThreshold()` | Endpoint `/api/threshold` — ubah threshold secara dinamis |
 | `handleGetPresets()` | Endpoint `GET /api/presets` — ambil daftar preset kustom |
 | `handlePostPresets()` | Endpoint `POST /api/presets` — simpan preset baru dari Growbot |
 | `handleGetHistory()` | Endpoint `/api/history` — 5 data ADC terakhir (dipakai Growbot) |
+| `handleSetSchedule()` | Endpoint `/api/schedule` — atur interval jadwal penyiraman |
 | `sendToBlynk()` | Timer 1 detik — kirim data sensor ke virtual pin Blynk |
 | `BLYNK_WRITE(V3)` | Handler kontrol pompa dari tombol di aplikasi Blynk |
-| `loop()` | Mengelola OTA, mDNS, Blynk, LCD paging, logika auto mode, timeout manual |
+| `loop()` | Mengelola OTA, mDNS, Blynk, LCD paging, logika auto mode, timeout manual, jadwal penyiraman |
 
 ---
 
@@ -92,8 +95,8 @@ Growmate/
 |---|---|
 | WEMOS D1 Mini / NodeMCU ESP8266 | — |
 | Sensor kelembaban tanah | `A0` |
-| Relay module | `D4` / GPIO 2, aktif LOW |
-| LCD I2C 16×2 | SDA (`D2`) · SCL (`D1`) |
+| Relay module | `D2` / GPIO 4, aktif HIGH |
+| LCD I2C 16×2 | SDA (`D4`) · SCL (`D5`) |
 | Pompa air mini DC | via relay |
 
 > ESP8266 hanya mendukung WiFi **2.4 GHz**. Pastikan tidak menggunakan jaringan 5 GHz.
@@ -151,6 +154,7 @@ Growmate/
 Buka `growmate/growmate.ino`, ubah bagian berikut:
 
 **Kredensial Blynk:**
+
 ```cpp
 #define BLYNK_TEMPLATE_ID   "TMPLxxxxxxxxxx"
 #define BLYNK_TEMPLATE_NAME "Growmate"
@@ -158,19 +162,22 @@ Buka `growmate/growmate.ino`, ubah bagian berikut:
 ```
 
 **Kredensial WiFi:**
+
 ```cpp
 const char* ssid     = "NamaWiFiKamu";
 const char* password = "PasswordWiFi";
 ```
 
 **Konfigurasi pin dan LCD:**
+
 ```cpp
 const int soilPin  = A0;
-const int relayPin = 2;                        // GPIO2 = D4, aktif LOW
+const int relayPin = D2;                       // GPIO4, aktif HIGH
 LiquidCrystal_I2C lcd(0x27, 16, 2);           // Coba 0x3F jika LCD tidak tampil
 ```
 
 **Threshold default** (hanya berlaku saat EEPROM kosong pertama kali):
+
 ```cpp
 int threshold = 700;   // 200–1024; rendah = basah, tinggi = kering
 ```
@@ -255,6 +262,18 @@ if (raw < threshold - 20 &&  isPumpOn) { isPumpOn = false; }
 
 Hysteresis ±20 mencegah relay chattering saat ADC berada di sekitar nilai threshold.
 
+### Jadwal penyiraman
+
+```cpp
+// Contoh: jadwal setiap 720 menit (12 jam)
+// GET /api/schedule?min=720&en=1
+if (schedEnabled && millis() - lastSchedWater >= schedIntervalMs) {
+  // aktifkan pompa selama 60 detik, lalu kembali ke mode sebelumnya
+}
+```
+
+Interval disimpan dalam satuan menit (uint16, maks 10.080 = 1 minggu). Format input yang diterima Growbot: `"24"` (24 jam), `"12j"`, `"90m"`, `"1j30m"`, `"10:30"`.
+
 ### Timeout manual
 
 ```cpp
@@ -268,6 +287,8 @@ const long manualTimeout = 60000;   // pompa mati otomatis setelah 60 detik
 | `0–1` | Threshold (int) | 2 byte |
 | `2` | Jumlah preset kustom (byte) | 1 byte |
 | `3–152` | Data preset: 13 byte nama + 2 byte threshold per slot, maks 10 slot | 150 byte |
+| `163` | schedEnabled (byte, 1=aktif) | 1 byte |
+| `164–165` | schedIntervalMin (uint16, menit) | 2 byte |
 
 ### Blynk non-blocking
 
@@ -280,16 +301,18 @@ Jika koneksi ke server Blynk terputus, sistem mencoba reconnect setiap 10 detik 
 | Method | Endpoint | Keterangan |
 |:---:|---|---|
 | GET | `/` | Halaman HTML dashboard |
-| GET | `/api/data` | Status lengkap (ADC, kondisi, pompa, mode, threshold, count) |
+| GET | `/api/data` | Status lengkap (ADC, kondisi, pompa, mode, threshold, count, jadwal) |
 | GET | `/api/threshold?val=700` | Ubah nilai threshold |
 | GET | `/api/presets` | Ambil daftar preset kustom (JSON array) |
 | POST | `/api/presets` | Simpan preset kustom (JSON body) |
 | GET | `/api/history` | 5 data ADC terakhir — dipakai Growbot |
+| GET | `/api/schedule?min=720&en=1` | Atur jadwal penyiraman (`en=0` untuk nonaktifkan) |
 | GET | `/on` | Manual ON |
 | GET | `/off` | Manual OFF |
 | GET | `/auto` | Mode otomatis |
 
 **Contoh respons `/api/data`:**
+
 ```json
 {
   "adc": 732,
@@ -298,7 +321,10 @@ Jika koneksi ke server Blynk terputus, sistem mencoba reconnect setiap 10 detik 
   "mode": "AUTO",
   "threshold": 700,
   "lastWatered": 143,
-  "count": 3
+  "count": 3,
+  "schedEnabled": true,
+  "schedIntervalMin": 720,
+  "schedElapsedMin": 45
 }
 ```
 
