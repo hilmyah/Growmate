@@ -590,7 +590,7 @@ void handleApi() {
   json += "\"threshold\":"        + String(threshold)        + ",";
   json += "\"lastWatered\":"      + String(elapsed)          + ",";
   json += "\"count\":"            + String(wateringCount)    + ",";
-  json += "\"schedEnabled\":"     + (schedEnabled ? "true" : "false") + ",";
+  json += "\"schedEnabled\":"     + String(schedEnabled ? "true" : "false") + ",";
   json += "\"schedIntervalMin\":" + String(schedIntervalMin) + ",";
   json += "\"schedElapsedMin\":"  + String(schedElapsedMin);
   json += "}";
