@@ -30,14 +30,14 @@ Firmware berjalan menggunakan penjadwalan fungsi modular (Ticker/BlynkTimer) unt
                |        Sistem Utama WEMOS D1 Mini          |
                |                                            |
 +----------+   |  +------------------+   +---------------+  |   +-------------+
-| Kelembaban|-->|  |  Pembacaan ADC   |   |  Lokal Web    |<->|   Growbot   |
-|  Tanah   |   |  |  & Kondisional   |   |  Server API   |  |   Gateway   |
+|Kelembaban|-->|  |  Pembacaan ADC   |   |  Lokal Web    | <|>  |   Growbot   |
+|  Tanah   |   |  |  & Kondisional   |   |  Server API   |  |   |   Gateway   |
 +----------+   |  +------------------+   +---------------+  |   +-------------+
                |           |                     ^          |
                |           v                     v          |
 +----------+   |  +------------------+   +---------------+  |   +-------------+
-| Relay &  |<--|  | Kontrol Aktuator |   | Eksekusi Data |<->| Blynk Cloud |
-| Pompa    |   |  |   (Relay/PWM)    |   |  EEPROM / RTC |  |   Service   |
+| Relay &  |<--|  | Kontrol Aktuator |   | Eksekusi Data | <|>  | Blynk Cloud |
+| Pompa    |   |  |   (Relay/PWM)    |   |  EEPROM / RTC |  |   |   Service   |
 +----------+   |  +------------------+   +---------------+  |   +-------------+
                +--------------------------------------------+
 
