@@ -37,7 +37,7 @@ Firmware berjalan menggunakan penjadwalan fungsi modular (Ticker/BlynkTimer) unt
                |           v                     v          |
 +----------+   |  +------------------+   +---------------+  |   +-------------+
 | Relay &  |<--|  | Kontrol Aktuator |   | Eksekusi Data | <|>  | Blynk Cloud |
-| Pompa    |   |  |   (Relay/PWM)    |   |  EEPROM / RTC |  |   |   Service   |
+| Pompa    |   |  |   (Relay/PWM)    |   | EEPROM / RTC  |  |   |   Service   |
 +----------+   |  +------------------+   +---------------+  |   +-------------+
                +--------------------------------------------+
 
