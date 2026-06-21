@@ -1,335 +1,132 @@
 <div align="center">
   <img src="asset/growmate1.png" alt="Growmate Logo" width="180"/>
   <h1>Growmate</h1>
-  <p>Sistem irigasi cerdas berbasis WEMOS D1 Mini / ESP8266 dengan Web Dashboard, LCD, Blynk, dan bot WhatsApp & Telegram</p>
+  <p>Sistem irigasi cerdas berbasis WEMOS D1 Mini / ESP8266 dengan Web Dashboard, LCD, Blynk, dan bot WhatsApp & Telegram.</p>
   <p>
     <a href="https://github.com/hilmyah/Growbot">🤖 Growbot — WhatsApp & Telegram Gateway</a>
   </p>
 </div>
 
----
-
-## Daftar Isi
-
-- [Tentang Proyek](#tentang-proyek)
-- [Fitur](#fitur)
-- [Struktur Repository](#struktur-repository)
-- [Persyaratan](#persyaratan)
-- [Tahap 1 — Persiapan Arduino IDE](#tahap-1--persiapan-arduino-ide)
-- [Tahap 2 — Setup Blynk](#tahap-2--setup-blynk)
-- [Tahap 3 — Konfigurasi Firmware](#tahap-3--konfigurasi-firmware)
-- [Tahap 4 — Upload ke WEMOS D1 Mini](#tahap-4--upload-ke-wemos-d1-mini)
-- [Tahap 5 — Remote Access](#tahap-5--remote-access)
-- [Penjelasan Kode](#penjelasan-kode)
-- [API Endpoint ESP8266](#api-endpoint-esp8266)
-
----
-
-## Tentang Proyek
-
-Growmate adalah firmware untuk **WEMOS D1 Mini / ESP8266** yang mengotomasi penyiraman tanaman berdasarkan pembacaan sensor kelembaban tanah. Status sistem ditampilkan secara real-time di **layar LCD I2C** yang terpasang langsung pada modul. Sistem dapat diakses melalui tiga antarmuka sekaligus: **Web Dashboard** yang berjalan langsung di ESP8266, **aplikasi Blynk** di smartphone, dan **bot WhatsApp & Telegram** melalui [Growbot](https://github.com/hilmyah/Growbot).
-
----
+![Platform](https://img.shields.io/badge/Platform-ESP8266%20%7C%20WEMOS%20D1%20Mini-orange?logo=espressif&logoColor=white)
+![Framework](https://img.shields.io/badge/Framework-Arduino%20IDE-00979D?logo=arduino&logoColor=white)
+![IoT Services](https://img.shields.io/badge/IoT-Blynk-04D683?logo=blynk&logoColor=white)
 
 ## Fitur
 
-- **LCD I2C real-time** — tiga halaman bergantian setiap 3 detik: kelembaban, mode & pompa, threshold & counter.
-- **Pembacaan sensor real-time** — nilai ADC (0–1024) dan persentase kelembaban ditampilkan di dashboard.
-- **Mode otomatis** — pompa menyala/mati berdasarkan nilai threshold dengan hysteresis ±20 ADC.
-- **Mode manual** — kontrol pompa langsung dengan timer otomatis 60 detik sebagai pengaman.
-- **Jadwal penyiraman** — interval penyiraman terjadwal (menit hingga mingguan) yang persisten di EEPROM; dapat diatur dari dashboard web maupun bot Growbot.
-- **Light / dark mode** — dashboard web dengan toggle tema terang dan gelap, tersimpan di browser.
-- **Grafik historis** — riwayat 40 pembacaan kelembaban terakhir dalam bentuk chart.
-- **Preset tanaman** — 10 preset bawaan, dapat ditambah hingga 10 preset kustom via dashboard atau bot.
-- **Persistensi EEPROM** — threshold, preset, dan jadwal tersimpan dan tidak hilang saat restart.
-- **mDNS** — akses dashboard via `http://growmate.local` tanpa perlu mengingat IP.
-- **OTA update** — upload firmware baru tanpa kabel melalui jaringan WiFi.
-- **Integrasi Blynk** — pantau dan kontrol pompa dari aplikasi Blynk (V0, V1, V2, V3).
-- **API JSON** — endpoint HTTP untuk integrasi dengan [Growbot](https://github.com/hilmyah/Growbot) (WhatsApp & Telegram gateway).
+| Fitur | Deskripsi |
+| --- | --- |
+| Otomasi & Mode Dual | Penyiraman otomatis berdasarkan batas ambang kelembaban tanah (*threshold*) atau eksekusi manual (Web/Blynk/Bot). |
+| Multi-Interface Monitor | Pemantauan data sensor secara *real-time* melalui LCD 16x2 fisik dan Web Dashboard lokal. |
+| Integrasi Cloud Blynk | Kontrol non-blocking jarak jauh menggunakan aplikasi Blynk IoT. |
+| Kompatibilitas Gateway | Menyediakan REST API lokal yang diintegrasikan dengan Growbot untuk interaksi via WhatsApp dan Telegram. |
+| Alokasi EEPROM | Menyimpan konfigurasi batas ambang, jadwal intermiten, dan kustomisasi preset tanaman secara persisten saat mati listrik. |
 
----
+## Konsep dan Arsitektur
+
+Firmware berjalan menggunakan penjadwalan fungsi modular (Ticker/BlynkTimer) untuk menjamin stabilitas fungsionalitas server HTTP lokal tanpa terinterupsi oleh kegagalan jaringan luar.
+
+```text
+               +--------------------------------------------+
+               |        Sistem Utama WEMOS D1 Mini          |
+               |                                            |
++----------+   |  +------------------+   +---------------+  |   +-------------+
+| Kelembaban|-->|  |  Pembacaan ADC   |   |  Lokal Web    |<->|   Growbot   |
+|  Tanah   |   |  |  & Kondisional   |   |  Server API   |  |   Gateway   |
++----------+   |  +------------------+   +---------------+  |   +-------------+
+               |           |                     ^          |
+               |           v                     v          |
++----------+   |  +------------------+   +---------------+  |   +-------------+
+| Relay &  |<--|  | Kontrol Aktuator |   | Eksekusi Data |<->| Blynk Cloud |
+| Pompa    |   |  |   (Relay/PWM)    |   |  EEPROM / RTC |  |   Service   |
++----------+   |  +------------------+   +---------------+  |   +-------------+
+               +--------------------------------------------+
+
+```
+
+## Prasyarat
+
+### Perangkat Keras (Hardware)
+
+* WEMOS D1 Mini (ESP8266)
+* Sensor Kelembaban Tanah Kapasitif / Resistif
+* Modul Relay 5V + Pompa Air DC
+* LCD I2C 16x2
+* Kabel Jumper & Breadboard
+
+### Dependensi Pustaka (Library Arduino)
+
+Pastikan pustaka berikut dipasang melalui *Library Manager* Arduino IDE sebelum melakukan kompilasi berkas `.ino`:
+
+| Nama Pustaka | Versi | Fungsi |
+| --- | --- | --- |
+| `ESP8266WiFi` | Bawaan Board | Manajemen konektivitas Wi-Fi ESP8266 |
+| `ESP8266WebServer` | Bawaan Board | Penyedia layanan REST API dan Web Dashboard |
+| `BlynkSimpleEsp8266` | Terbaru | Komunikasi data duplex ke server cloud Blynk |
+| `LiquidCrystal_I2C` | Terbaru | Driver penampilan visual data ke modul LCD 16x2 |
+| `ArduinoJson` | v6.x / v7.x | Pemrosesan serialisasi dan parsing data struktur JSON |
 
 ## Struktur Repository
 
-```
-Growmate/
-├── growmate/
-│   └── growmate.ino      # Firmware utama ESP8266
-├── asset/
-│   ├── growmate.png      # Logo proyek (ikon)
-│   ├── growmate1.png     # Logo proyek (full)
-│   ├── flowchart.png     # Diagram alur sistem (PNG)
-│   └── growmate.svg      # Logo versi vektor
-├── index.html            # Halaman link proyek (portal publik / QR pamflet)
-└── README.md
-```
+| Direktori/File | Fungsi |
+| --- | --- |
+| `growmate/` | Folder root sketsa program Arduino utama. |
+| `growmate/growmate.ino` | Berkas kode utama yang berisi alur logika inisialisasi, perulangan, dan penanganan HTTP request. |
+| `asset/` | Folder aset statis lokal untuk dokumentasi grafis (Logo, Skema). |
+| `index.html` | Kode sumber mentah visualisasi Web Dashboard yang ditanamkan ke dalam memori program flash ESP8266. |
 
-### Ringkasan `growmate.ino`
+## Konfigurasi Firmware
 
-| Fungsi / Bagian | Keterangan |
-|---|---|
-| `loadFromEEPROM()` | Membaca threshold, preset, dan jadwal dari EEPROM saat boot |
-| `saveThreshold()` | Menyimpan nilai threshold ke EEPROM setiap kali diubah |
-| `savePresetsToEEPROM()` | Menyimpan seluruh data preset ke EEPROM |
-| `saveScheduleToEEPROM()` | Menyimpan konfigurasi jadwal penyiraman ke EEPROM |
-| `updateLCD()` | Memperbarui tampilan LCD — 3 halaman bergantian tiap 3 detik |
-| `updatePumpState()` | Mengontrol relay pompa dan memperbarui status ke Blynk |
-| `MAIN_page[]` | Halaman HTML dashboard (inline di PROGMEM, light/dark mode, Chart.js) |
-| `handleApi()` | Endpoint `/api/data` — JSON status sensor, sistem, dan jadwal |
-| `handleSetThreshold()` | Endpoint `/api/threshold` — ubah threshold secara dinamis |
-| `handleGetPresets()` | Endpoint `GET /api/presets` — ambil daftar preset kustom |
-| `handlePostPresets()` | Endpoint `POST /api/presets` — simpan preset baru dari Growbot |
-| `handleGetHistory()` | Endpoint `/api/history` — 5 data ADC terakhir (dipakai Growbot) |
-| `handleSetSchedule()` | Endpoint `/api/schedule` — atur interval jadwal penyiraman |
-| `sendToBlynk()` | Timer 1 detik — kirim data sensor ke virtual pin Blynk |
-| `BLYNK_WRITE(V3)` | Handler kontrol pompa dari tombol di aplikasi Blynk |
-| `loop()` | Mengelola OTA, mDNS, Blynk, LCD paging, logika auto mode, timeout manual, jadwal penyiraman |
-
----
-
-## Persyaratan
-
-**Perangkat keras:**
-
-| Komponen | Pin |
-|---|---|
-| WEMOS D1 Mini / NodeMCU ESP8266 | — |
-| Sensor kelembaban tanah | `A0` |
-| Relay module | `D2` / GPIO 4, aktif HIGH |
-| LCD I2C 16×2 | SDA (`D4`) · SCL (`D5`) |
-| Pompa air mini DC | via relay |
-
-> ESP8266 hanya mendukung WiFi **2.4 GHz**. Pastikan tidak menggunakan jaringan 5 GHz.
-
-**Perangkat lunak:**
-
-- Arduino IDE 1.8+ atau 2.x
-- Board package: ESP8266 by ESP8266 Community
-- Library: `Blynk`, `LiquidCrystal_I2C`, `Wire`, `ESP8266WiFi`, `ESP8266WebServer`, `ESP8266mDNS`, `ArduinoOTA`, `EEPROM`
-- Akun [Blynk](https://blynk.io) (gratis)
-
----
-
-## Tahap 1 — Persiapan Arduino IDE
-
-**Instal board ESP8266:**
-
-1. Buka Arduino IDE → **File → Preferences**
-2. Di kolom **Additional Boards Manager URLs**, tambahkan:
-   ```
-   https://arduino.esp8266.com/stable/package_esp8266com_index.json
-   ```
-3. Buka **Tools → Board → Boards Manager**, cari `esp8266`, instal **ESP8266 by ESP8266 Community**
-4. Pilih board: **Tools → Board → ESP8266 Boards → LOLIN(WEMOS) D1 R2 & Mini**
-
-**Instal library yang dibutuhkan** (via Sketch → Include Library → Manage Libraries):
-
-| Library | Sumber |
-|---|---|
-| `Blynk` | Library Manager — "Blynk" oleh Volodymyr Shymanskyy |
-| `LiquidCrystal I2C` | Library Manager — "LiquidCrystal I2C" oleh Frank de Brabander |
-| `ESP8266WiFi`, `ESP8266WebServer`, `ESP8266mDNS`, `ArduinoOTA`, `EEPROM` | Otomatis tersedia setelah board package terinstal |
-| `Wire` | Built-in |
-
----
-
-## Tahap 2 — Setup Blynk
-
-1. Buat akun di [blynk.io](https://blynk.io) → buat **Template** baru (Hardware: ESP8266, Connection: WiFi)
-2. Buat **Datastream** berikut:
-
-   | Virtual Pin | Nama | Tipe | Keterangan |
-   |:---:|---|:---:|---|
-   | V0 | Soil ADC | Integer | Nilai ADC mentah (0–1024) |
-   | V1 | Mode | String | Auto / Manual ON / Manual OFF |
-   | V2 | Kelembaban % | Integer | Persentase kelembaban (0–100%) |
-   | V3 | Kontrol Pompa | Integer | 1 = ON · 0 = OFF |
-
-3. Buat **Device** dari template, salin **Template ID**, **Template Name**, dan **Auth Token**
-
----
-
-## Tahap 3 — Konfigurasi Firmware
-
-Buka `growmate/growmate.ino`, ubah bagian berikut:
-
-**Kredensial Blynk:**
+Buka berkas `growmate.ino`, lalu sesuaikan parameter makro dan variabel global berikut sebelum melakukan *flashing* ke mikrokontroler:
 
 ```cpp
-#define BLYNK_TEMPLATE_ID   "TMPLxxxxxxxxxx"
-#define BLYNK_TEMPLATE_NAME "Growmate"
-#define BLYNK_AUTH_TOKEN    "xxxxxxxxxxxx"
+// Konfigurasi Kredensial Wi-Fi Lokal
+const char* ssid = "NAMA_WIFI_ANDA";
+const char* password = "PASSWORD_WIFI_ANDA";
+
+// Konfigurasi Otentikasi Blynk IoT
+char auth[] = "BLYNK_AUTH_TOKEN_ANDA";
+char templateId[] = "BLYNK_TEMPLATE_ID_ANDA";
+char templateName[] = "BLYNK_TEMPLATE_NAME_ANDA";
+
+// Batas Nilai Analog Sensor Kelembaban (Kalibrasi)
+int thresholdSore = 700; // Nilai default ambang batas penyiraman otomatis
+
 ```
 
-**Kredensial WiFi:**
+## Referensi API Endpoint
 
-```cpp
-const char* ssid     = "NamaWiFiKamu";
-const char* password = "PasswordWiFi";
-```
+ESP8266 menjalankan server HTTP lokal pada port 80. Endpoint berikut dapat diakses oleh browser atau dihubungkan ke server perantara (Growbot Gateway):
 
-**Konfigurasi pin dan LCD:**
+| Method | Endpoint | Fungsi |
+| --- | --- | --- |
+| **GET** | `/` | Memuat antarmuka web dashboard berbasis HTML grafis. |
+| **GET** | `/api/data` | Mengembalikan status terkini sistem (ADC, status pompa, mode aktif, ambang batas, jadwal) dalam format JSON. |
+| **GET** | `/api/threshold?val=[nilai]` | Mengubah nilai ambang batas otomatis secara dinamis dan menyimpannya ke EEPROM. |
+| **GET** | `/api/presets` | Mengambil daftar preset tanaman khusus yang tersimpan di dalam EEPROM. |
+| **POST** | `/api/presets` | Menyimpan modifikasi data pengaturan preset tanaman ke EEPROM. |
+| **GET** | `/api/history` | Mengembalikan susunan data riwayat pembacaan 5 nilai ADC terakhir. |
+| **GET** | `/api/schedule?min=[menit]&en=[0/1]` | Mengonfigurasi penjadwalan waktu siram intermiten berkelanjutan. |
+| **GET** | `/on` | Memaksa aktuator pompa untuk aktif secara manual (mengubah mode ke MANUAL). |
+| **GET** | `/off` | Memaksa aktuator pompa untuk mati secara manual (mengubah mode ke MANUAL). |
+| **GET** | `/auto` | Mengembalikan alur kontrol pompa ke logika pemrosesan otomatis berdasarkan sensor. |
 
-```cpp
-const int soilPin  = A0;
-const int relayPin = D2;                       // GPIO4, aktif HIGH
-LiquidCrystal_I2C lcd(0x27, 16, 2);           // Coba 0x3F jika LCD tidak tampil
-```
+## Peta Memori Struktur EEPROM
 
-**Threshold default** (hanya berlaku saat EEPROM kosong pertama kali):
+Penyimpanan data parameter konfigurasi di dalam EEPROM menggunakan tata letak alokasi byte berikut secara persisten:
 
-```cpp
-int threshold = 700;   // 200–1024; rendah = basah, tinggi = kering
-```
+| Alokasi Byte | Parameter Komponen | Ukuran Data |
+| --- | --- | --- |
+| `0–1` | Nilai Batas Ambang Utama (*Threshold*) | 2 Byte (uint16_t) |
+| `2` | Jumlah total slot kustom preset tanaman | 1 Byte |
+| `3–152` | Blok Data Kustom Preset (Maksimal 10 Slot Tanaman @15 Byte: 13 Byte Nama + 2 Byte Batas Nilai) | 150 Byte |
+| `163` | Status Penjadwalan Aktif (`schedEnabled`, 1 = Aktif) | 1 Byte |
+| `164–165` | Durasi Interval Interval Jadwal (`schedIntervalMin`) | 2 Byte (uint16_t) |
 
----
+## Manajemen dan Operasional
 
-## Tahap 4 — Upload ke WEMOS D1 Mini
-
-1. Hubungkan WEMOS ke komputer via USB Micro-B
-2. Atur di Arduino IDE:
-
-   | Pengaturan | Nilai |
-   |---|---|
-   | Board | LOLIN(WEMOS) D1 R2 & Mini |
-   | Upload Speed | 115200 |
-   | Port | Pilih port COM yang muncul |
-
-3. Klik **Upload**, tunggu `Done uploading`
-4. Buka **Serial Monitor** @ 115200 baud — catat IP ESP8266:
-   ```
-   WiFi connected — 192.168.1.X
-   mDNS started — http://growmate.local
-   System ready — http://192.168.1.X
-   ```
-5. Buka browser di perangkat yang satu jaringan, akses `http://growmate.local`
-
-> **Troubleshooting LCD:** Jika menampilkan karakter acak, pastikan VCC LCD terhubung ke pin **5V** Wemos (bukan 3.3V). Jika tidak tampil sama sekali, coba ubah alamat dari `0x27` ke `0x3F`. Upload sketch `i2c_scanner.ino` untuk menemukan alamat yang benar.
-
----
-
-## Tahap 5 — Remote Access
-
-Agar [Growbot](https://github.com/hilmyah/Growbot) yang berjalan di cloud dapat berkomunikasi dengan ESP8266 di jaringan lokal, jalankan salah satu metode berikut di komputer yang **satu jaringan WiFi dengan ESP8266**.
-
-### Opsi A — Cloudflare Tunnel (Direkomendasikan)
-
-```bash
-# Instalasi
-brew install cloudflared           # macOS
-winget install Cloudflare.cloudflared  # Windows
-
-# Jalankan tunnel
-cloudflared tunnel --url http://192.168.1.X
-```
-
-URL publik muncul di terminal — salin ke `ESP_URL` di Growbot.
-
-> URL berubah setiap `cloudflared` dijalankan ulang. Untuk URL permanen, buat [Named Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) dengan akun Cloudflare gratis.
-
-### Opsi B — Tailscale
-
-```bash
-# Linux / macOS
-sudo tailscale up --advertise-routes=192.168.1.0/24
-
-# Windows (PowerShell sebagai Administrator)
-tailscale up --advertise-routes=192.168.1.0/24
-```
-
-Setujui route di [Tailscale Admin Console](https://login.tailscale.com/admin/machines), lalu gunakan IP lokal ESP8266 sebagai `ESP_URL`.
-
----
-
-## Penjelasan Kode
-
-### LCD paging
-
-LCD I2C diperbarui tiap 1 detik secara non-blocking (`millis()`). Tiga halaman bergantian setiap 3 detik:
-
-| Halaman | Baris 1 | Baris 2 |
-|:---:|---|---|
-| 1 | `Tanah: BASAH` | `ADC: 412   60%` |
-| 2 | `Mode: AUTO` | `Pompa: OFF` |
-| 3 | `Batas: 700` | `Disiram:   0 kali` |
-
-### Logika mode otomatis
-
-```cpp
-if (raw > threshold + 20 && !isPumpOn) { isPumpOn = true; wateringCount++; }
-if (raw < threshold - 20 &&  isPumpOn) { isPumpOn = false; }
-```
-
-Hysteresis ±20 mencegah relay chattering saat ADC berada di sekitar nilai threshold.
-
-### Jadwal penyiraman
-
-```cpp
-// Contoh: jadwal setiap 720 menit (12 jam)
-// GET /api/schedule?min=720&en=1
-if (schedEnabled && millis() - lastSchedWater >= schedIntervalMs) {
-  // aktifkan pompa selama 60 detik, lalu kembali ke mode sebelumnya
-}
-```
-
-Interval disimpan dalam satuan menit (uint16, maks 10.080 = 1 minggu). Format input yang diterima Growbot: `"24"` (24 jam), `"12j"`, `"90m"`, `"1j30m"`, `"10:30"`.
-
-### Timeout manual
-
-```cpp
-const long manualTimeout = 60000;   // pompa mati otomatis setelah 60 detik
-```
-
-### Penyimpanan EEPROM
-
-| Alamat | Data | Ukuran |
-|:---:|---|:---:|
-| `0–1` | Threshold (int) | 2 byte |
-| `2` | Jumlah preset kustom (byte) | 1 byte |
-| `3–152` | Data preset: 13 byte nama + 2 byte threshold per slot, maks 10 slot | 150 byte |
-| `163` | schedEnabled (byte, 1=aktif) | 1 byte |
-| `164–165` | schedIntervalMin (uint16, menit) | 2 byte |
-
-### Blynk non-blocking
-
-Jika koneksi ke server Blynk terputus, sistem mencoba reconnect setiap 10 detik tanpa menghentikan web server, pembacaan sensor, atau tampilan LCD.
-
----
-
-## API Endpoint ESP8266
-
-| Method | Endpoint | Keterangan |
-|:---:|---|---|
-| GET | `/` | Halaman HTML dashboard |
-| GET | `/api/data` | Status lengkap (ADC, kondisi, pompa, mode, threshold, count, jadwal) |
-| GET | `/api/threshold?val=700` | Ubah nilai threshold |
-| GET | `/api/presets` | Ambil daftar preset kustom (JSON array) |
-| POST | `/api/presets` | Simpan preset kustom (JSON body) |
-| GET | `/api/history` | 5 data ADC terakhir — dipakai Growbot |
-| GET | `/api/schedule?min=720&en=1` | Atur jadwal penyiraman (`en=0` untuk nonaktifkan) |
-| GET | `/on` | Manual ON |
-| GET | `/off` | Manual OFF |
-| GET | `/auto` | Mode otomatis |
-
-**Contoh respons `/api/data`:**
-
-```json
-{
-  "adc": 732,
-  "kondisi": "KERING",
-  "pump": "ON",
-  "mode": "AUTO",
-  "threshold": 700,
-  "lastWatered": 143,
-  "count": 3,
-  "schedEnabled": true,
-  "schedIntervalMin": 720,
-  "schedElapsedMin": 45
-}
-```
-
----
-
-<div align="center">
-  <sub>Growmate · Tugas PKK · 2025 &nbsp;|&nbsp; <a href="https://github.com/hilmyah/Growbot">Growbot — WhatsApp & Telegram Gateway</a></sub>
-</div>
+1. Sambungkan papan pengembang WEMOS D1 Mini ke komputer menggunakan kabel data micro-USB yang kompatibel.
+2. Buka aplikasi **Arduino IDE**, arahkan opsi menu ke `Tools` -> `Board` -> `ESP8266 Boards` -> Pilih `WEMOS D1 R1 & mini`.
+3. Tentukan port COM yang sesuai pada menu `Tools` -> `Port`.
+4. Tekan tombol **Verify** (ikon centang) untuk memastikan seluruh pustaka dependensi telah lengkap dan kompilasi berhasil.
+5. Tekan tombol **Upload** (ikon panah kanan) untuk memuat kode biner langsung ke papan pengembang.
+6. Buka fitur **Serial Monitor** pada *baud rate* `115200` untuk memantau alamat IP lokal yang didapatkan perangkat dari jaringan Wi-Fi.
